@@ -1,79 +1,70 @@
 import streamlit as st
 from PIL import Image
+import numpy as np
 
-def encode_image(original_image, secret_message):
-    img = Image.open(original_image)
-    binary_secret_message = ''.join(format(ord(char), '08b') for char in secret_message)
+def text_to_binary(text):
+    binary_result = ' '.join(format(ord(char), '08b') for char in text)
+    return binary_result
 
+def binary_to_text(binary_str):
+    binary_values = binary_str.split(' ')
+    ascii_characters = ''.join(chr(int(b, 2)) for b in binary_values)
+    return ascii_characters
+
+def encode_image(img, message):
+    binary_message = text_to_binary(message)
     data_index = 0
-    img_data = list(img.getdata())
 
-    for i in range(len(img_data)):
-        if img.mode == 'RGB':
-            pixel = list(img_data[i])  # Convert the tuple to a list
-        else:
-            pixel = [img_data[i]]  # Create a list with the single pixel value
+    img_array = np.array(img)
+    for i in range(img_array.shape[0]):
+        for j in range(img_array.shape[1]):
+            for k in range(3):  # Loop through RGB channels
+                if data_index < len(binary_message):
+                    img_array[i, j, k] = img_array[i, j, k] & ~1 | int(binary_message[data_index])
+                    data_index += 1
+                else:
+                    break
+            if data_index >= len(binary_message):
+                break
 
-        for j in range(len(pixel)):
-            if data_index < len(binary_secret_message):
-                # Mask the last bit of the pixel value and replace it with the secret message bit
-                pixel[j] = (pixel[j] & ~1) | (int(binary_secret_message[data_index]) << j)
-                data_index += 1
-
-        if img.mode == 'RGB':
-            img_data[i] = tuple(pixel)  # Convert the list back to a tuple
-        else:
-            img_data[i] = pixel[0]  # Get the single pixel value from the list
-
-    encoded_img = Image.new(img.mode, img.size)
-    encoded_img.putdata(img_data)
-
+    encoded_img = Image.fromarray(img_array)
     return encoded_img
 
+def decode_image(img):
+    binary_message = ''
+    
+    img_array = np.array(img)
+    for i in range(img_array.shape[0]):
+        for j in range(img_array.shape[1]):
+            for k in range(3):  # Loop through RGB channels
+                binary_message += str(img_array[i, j, k] & 1)
+    
+    return binary_to_text(binary_message)
 
-
-
-def decode_image(encoded_image):
-    img = Image.open(encoded_image)
-    binary_data = ''
-
-    img_data = list(img.getdata())
-
-    for i in range(len(img_data)):
-        pixel = list(img_data[i])
-
-        for j in range(3):
-            binary_data += str(pixel[j] & 1)
-
-    decoded_message = ''.join([chr(int(binary_data[i:i+8], 2)) for i in range(0, len(binary_data), 8)])
-    return decoded_message
-
-
+# Streamlit App
 def main():
-    st.title("Steganography Tool")
+    st.title("LSB Steganography with Streamlit")
 
-    menu = ["Encode", "Decode"]
-    choice = st.sidebar.selectbox("Select Option", menu)
+    uploaded_image = st.file_uploader("Choose an image...", type="jpg")
 
-    if choice == "Encode":
-        st.subheader("Encode Your Message")
+    if uploaded_image is not None:
+        original_image = Image.open(uploaded_image)
+        st.image(original_image, caption="Original Image", use_column_width=True)
 
-        original_image = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
-        if original_image is not None:
-            secret_message = st.text_area("Enter your secret message")
+        operation = st.sidebar.radio("Select operation:", ("Encode", "Decode"))
 
+        if operation == "Encode":
+            message = st.text_area("Enter the message to encode:")
             if st.button("Encode"):
-                encoded_img = encode_image(original_image, secret_message)
-                st.image(encoded_img, caption="Encoded Image", use_column_width=True, channels="RGB")
-                st.write(f"Image Dimensions: {encoded_img.size[0]} x {encoded_img.size[1]}")
+                if message:
+                    encoded_image = encode_image(original_image, message)
+                    st.image(encoded_image, caption="Encoded Image", use_column_width=True)
+                else:
+                    st.warning("Please enter a message to encode.")
 
-    elif choice == "Decode":
-        st.subheader("Decode Message from Image")
-
-        encoded_image = st.file_uploader("Upload Encoded Image", type=["jpg", "jpeg", "png"])
-        if encoded_image is not None:
+        elif operation == "Decode":
             if st.button("Decode"):
-                decoded_message = decode_image(encoded_image)
+                decoded_message = decode_image(original_image)
                 st.success(f"Decoded Message: {decoded_message}")
 
 if __name__ == "__main__":
