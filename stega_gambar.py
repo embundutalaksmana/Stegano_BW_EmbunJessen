@@ -3,13 +3,15 @@ from PIL import Image
 import io
 
 def encode(img, message):
+    if img.mode in ('RGBA', 'P'):
+        img = img.convert('RGB')
     pixels = list(img.getdata())
     binary_message = ''.join(format(ord(char), '08b') for char in message) + '1111111111111110'
 
     data_index = 0
     for i in range(len(pixels)):
         pixel = list(pixels[i])
-        for j in range(len(pixel)):
+        for j in range(3):
             if data_index < len(binary_message):
                 pixel[j] = pixel[j] & ~1 | int(binary_message[data_index])
                 data_index += 1
@@ -21,11 +23,13 @@ def encode(img, message):
     return encoded_img
 
 def decode(img):
+    if img.mode in ('RGBA', 'P'):
+        img = img.convert('RGB')
     pixels = list(img.getdata())
     binary_message = ''
 
     for pixel in pixels:
-        for j in range(len(pixel)):
+        for j in range(3):
             binary_message += str(pixel[j] & 1)
 
     delimiter_index = binary_message.find('1111111111111110')
