@@ -2,9 +2,11 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 
-def text_to_binary(text):
-    binary_result = ''.join(format(ord(char), '08b') for char in text)
-    return binary_result
+def binary_to_text(binary_str):
+    binary_values = binary_str.split(' ')
+    ascii_characters = ''.join(chr(int(b, 2)) for b in binary_values if b)
+    return ascii_characters
+
 
 def encode_image(img, message):
     binary_message = text_to_binary(message)
