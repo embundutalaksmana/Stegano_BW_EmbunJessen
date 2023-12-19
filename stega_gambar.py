@@ -1,8 +1,8 @@
 import streamlit as st
 from PIL import Image
+import io
 
-def encode(image_path, message):
-    img = Image.open(image_path)
+def encode(img, message):
     pixels = list(img.getdata())
     binary_message = ''.join(format(ord(char), '08b') for char in message) + '1111111111111110'
 
@@ -20,8 +20,7 @@ def encode(image_path, message):
     encoded_img.putdata(pixels)
     return encoded_img
 
-def decode(image_path):
-    img = Image.open(image_path)
+def decode(img):
     pixels = list(img.getdata())
     binary_message = ''
 
@@ -47,7 +46,8 @@ if option == "Encode":
 
     if st.button("Encode"):
         if image_file is not None and message != "":
-            encoded_img = encode(image_file, message)
+            img = Image.open(io.BytesIO(image_file.read()))
+            encoded_img = encode(img, message)
             st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
         else:
             st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
@@ -58,7 +58,8 @@ elif option == "Decode":
 
     if st.button("Decode"):
         if image_file is not None:
-            decoded_message = decode(image_file)
+            img = Image.open(io.BytesIO(image_file.read()))
+            decoded_message = decode(img)
             st.success(f"Pesan yang diekstrak: {decoded_message}")
         else:
             st.warning("Silakan pilih gambar terlebih dahulu.")
