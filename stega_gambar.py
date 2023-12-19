@@ -78,9 +78,9 @@ def steganography_app():
                 st.warning("Please upload an encoded image.")
 
     elif operation == "About":
-        st.subheader("Decode Data from Image")
-        image_file = st.file_uploader("Upload Encoded Image", type=["jpg", "jpeg", "png"])
-
+        st.subheader("Kelompok Sekian | 4 TI E")
+        st.write("Embun Duta Laksmana")
+        st.write("Jessen Wind Lim")
        
 def decode_enc(image):
     data = ''
