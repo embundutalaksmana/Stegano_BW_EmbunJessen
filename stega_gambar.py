@@ -9,20 +9,21 @@ def encode_image(original_image, secret_message):
     img_data = list(img.getdata())
 
     for i in range(len(img_data)):
-        pixel = img_data[i]
+        pixel = list(img_data[i])  # Convert the tuple to a list
 
         for j in range(3):
             if data_index < len(binary_secret_message):
                 # Mask the last bit of the pixel value and replace it with the secret message bit
-                pixel = (pixel & ~1) | (int(binary_secret_message[data_index]) << j)
+                pixel[j] = (pixel[j] & ~1) | (int(binary_secret_message[data_index]) << j)
                 data_index += 1
 
-        img_data[i] = pixel
+        img_data[i] = tuple(pixel)  # Convert the list back to a tuple
 
     encoded_img = Image.new("RGB", img.size)
     encoded_img.putdata(img_data)
 
     return encoded_img
+
 
 
 def decode_image(encoded_image):
