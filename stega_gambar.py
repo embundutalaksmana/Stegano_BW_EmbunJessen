@@ -3,15 +3,27 @@ from PIL import Image
 import numpy as np
 
 def text_to_binary(text):
-    binary_result = ' '.join(format(ord(char), '08b') for char in text)
+    binary_result = ''.join(format(ord(char), '08b') for char in text)
     return binary_result
 
-def binary_to_text(binary_str):
-    binary_values = binary_str.split(' ')
-    ascii_characters = ''.join(chr(int(b, 2)) for b in binary_values if b)
-    return ascii_characters
-
 def encode_image(img, message):
+    binary_message = text_to_binary(message)
+    data_index = 0
+
+    img_array = np.array(img)
+    for i in range(img_array.shape[0]):
+        for j in range(img_array.shape[1]):
+            for k in range(3):  # Loop through RGB channels
+                if data_index < len(binary_message):
+                    img_array[i, j, k] = img_array[i, j, k] & ~1 | int(binary_message[data_index])
+                    data_index += 1
+                else:
+                    break
+            if data_index >= len(binary_message):
+                break
+
+    encoded_img = Image.fromarray(img_array)
+    return encoded_img
     binary_message = text_to_binary(message)
     data_index = 0
 
