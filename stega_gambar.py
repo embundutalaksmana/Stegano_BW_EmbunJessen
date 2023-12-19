@@ -48,7 +48,7 @@ def encode_enc(newimg, data):
 def steganography_app():
     st.title("Steganography with Image B & W")
 
-    operation = st.sidebar.selectbox("Select Operation", ["Encode", "Decode"])
+    operation = st.sidebar.selectbox("Select Operation", ["Encode", "Decode","About"])
 
     if operation == "Encode":
         st.subheader("Encode Data into Image")
@@ -76,7 +76,8 @@ def steganography_app():
                 st.success(f"Decoded Data: {decoded_data}")
             else:
                 st.warning("Please upload an encoded image.")
-    elif operation == "Decoder":
+
+    elif operation == "About":
         st.subheader("Decode Data from Image")
         image_file = st.file_uploader("Upload Encoded Image", type=["jpg", "jpeg", "png"])
 
