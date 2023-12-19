@@ -25,8 +25,8 @@ def decode(img):
     binary_message = ''
 
     for pixel in pixels:
-        for value in pixel:
-            binary_message += str(value & 1)
+        for j in range(3):
+            binary_message += str(pixel[j] & 1)
 
     delimiter_index = binary_message.find('1111111111111110')
     binary_message = binary_message[:delimiter_index]
