@@ -41,6 +41,7 @@ def decode_image(encoded_image):
     decoded_message = ''.join([chr(int(binary_data[i:i+8], 2)) for i in range(0, len(binary_data), 8)])
     return decoded_message
 
+
 def main():
     st.title("Steganography Tool")
 
