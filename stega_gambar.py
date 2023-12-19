@@ -1,18 +1,14 @@
 import streamlit as st
 from PIL import Image
 
-# Fungsi untuk menyisipkan pesan ke dalam gambar
 def encode(image_path, message):
     img = Image.open(image_path)
     pixels = list(img.getdata())
-
-    binary_message = ''.join(format(ord(char), '08b') for char in message)
-    binary_message += '1111111111111110'  # Menambahkan delimiter akhir pesan
+    binary_message = ''.join(format(ord(char), '08b') for char in message) + '1111111111111110'
 
     data_index = 0
     for i in range(len(pixels)):
         pixel = list(pixels[i])
-
         for j in range(3):
             if data_index < len(binary_message):
                 pixel[j] = pixel[j] & ~1 | int(binary_message[data_index])
@@ -24,18 +20,14 @@ def encode(image_path, message):
     encoded_img.putdata(pixels)
     return encoded_img
 
-# Fungsi untuk mengekstrak pesan dari gambar
 def decode(image_path):
     img = Image.open(image_path)
     pixels = list(img.getdata())
-
     binary_message = ''
-    data_index = 0
 
     for pixel in pixels:
         for value in pixel:
             binary_message += str(value & 1)
-            data_index += 1
 
     delimiter_index = binary_message.find('1111111111111110')
     binary_message = binary_message[:delimiter_index]
