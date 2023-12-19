@@ -2,10 +2,10 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 
-def binary_to_text(binary_str):
-    binary_values = [binary_str[i:i+8] for i in range(0, len(binary_str), 8)]
-    ascii_characters = ''.join(chr(int(b, 2)) for b in binary_values if b)
-    return ascii_characters
+def text_to_binary(text):
+    binary_result = ''.join(format(ord(char), '08b') for char in text)
+    return binary_result
+
 
 
 
