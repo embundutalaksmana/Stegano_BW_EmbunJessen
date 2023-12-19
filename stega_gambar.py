@@ -8,7 +8,7 @@ def text_to_binary(text):
 
 def binary_to_text(binary_str):
     binary_values = binary_str.split(' ')
-    ascii_characters = ''.join(chr(int(b, 2)) for b in binary_values)
+    ascii_characters = ''.join(chr(int(b, 2)) for b in binary_values if b)
     return ascii_characters
 
 def encode_image(img, message):
