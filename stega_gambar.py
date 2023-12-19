@@ -1,86 +1,72 @@
 import streamlit as st
 from PIL import Image
-import numpy as np
 
-def text_to_binary(text):
-    binary_result = ''.join(format(ord(char), '08b') for char in text)
-    return binary_result
+# Fungsi untuk menyisipkan pesan ke dalam gambar
+def encode(image_path, message):
+    img = Image.open(image_path)
+    pixels = list(img.getdata())
 
+    binary_message = ''.join(format(ord(char), '08b') for char in message)
+    binary_message += '1111111111111110'  # Menambahkan delimiter akhir pesan
 
-
-
-def encode_image(img, message):
-    binary_message = text_to_binary(message)
     data_index = 0
+    for i in range(len(pixels)):
+        pixel = list(pixels[i])
 
-    img_array = np.array(img)
-    for i in range(img_array.shape[0]):
-        for j in range(img_array.shape[1]):
-            for k in range(3):  # Loop through RGB channels
-                if data_index < len(binary_message):
-                    img_array[i, j, k] = img_array[i, j, k] & ~1 | int(binary_message[data_index])
-                    data_index += 1
-                else:
-                    break
-            if data_index >= len(binary_message):
-                break
+        for j in range(3):
+            if data_index < len(binary_message):
+                pixel[j] = pixel[j] & ~1 | int(binary_message[data_index])
+                data_index += 1
 
-    encoded_img = Image.fromarray(img_array)
-    return encoded_img
-    binary_message = text_to_binary(message)
-    data_index = 0
+        pixels[i] = tuple(pixel)
 
-    img_array = np.array(img)
-    for i in range(img_array.shape[0]):
-        for j in range(img_array.shape[1]):
-            for k in range(3):  # Loop through RGB channels
-                if data_index < len(binary_message):
-                    img_array[i, j, k] = img_array[i, j, k] & ~1 | int(binary_message[data_index])
-                    data_index += 1
-                else:
-                    break
-            if data_index >= len(binary_message):
-                break
-
-    encoded_img = Image.fromarray(img_array)
+    encoded_img = Image.new(img.mode, img.size)
+    encoded_img.putdata(pixels)
     return encoded_img
 
-def decode_image(img):
+# Fungsi untuk mengekstrak pesan dari gambar
+def decode(image_path):
+    img = Image.open(image_path)
+    pixels = list(img.getdata())
+
     binary_message = ''
-    
-    img_array = np.array(img)
-    for i in range(img_array.shape[0]):
-        for j in range(img_array.shape[1]):
-            for k in range(3):  # Loop through RGB channels
-                binary_message += str(img_array[i, j, k] & 1)
-    
-    return binary_to_text(binary_message)
+    data_index = 0
+
+    for pixel in pixels:
+        for value in pixel:
+            binary_message += str(value & 1)
+            data_index += 1
+
+    delimiter_index = binary_message.find('1111111111111110')
+    binary_message = binary_message[:delimiter_index]
+
+    message = ''.join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
+    return message
 
 # Streamlit App
-def main():
-    st.title("LSB Steganography with Streamlit")
+st.title("Steganografi Gambar dengan LSB")
 
-    uploaded_image = st.file_uploader("Choose an image...", type="jpg")
+option = st.selectbox("Pilih Operasi", ["Encode", "Decode"])
 
-    if uploaded_image is not None:
-        original_image = Image.open(uploaded_image)
-        st.image(original_image, caption="Original Image", use_column_width=True)
+if option == "Encode":
+    st.subheader("Sisipkan Pesan ke dalam Gambar")
+    image_file = st.file_uploader("Pilih Gambar", type=["jpg", "jpeg", "png"])
+    message = st.text_area("Masukkan Pesan yang Akan Disisipkan")
 
-        operation = st.sidebar.radio("Select operation:", ("Encode", "Decode"))
+    if st.button("Encode"):
+        if image_file is not None and message != "":
+            encoded_img = encode(image_file, message)
+            st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
+        else:
+            st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
 
-        if operation == "Encode":
-            message = st.text_area("Enter the message to encode:")
-            if st.button("Encode"):
-                if message:
-                    encoded_image = encode_image(original_image, message)
-                    st.image(encoded_image, caption="Encoded Image", use_column_width=True)
-                else:
-                    st.warning("Please enter a message to encode.")
+elif option == "Decode":
+    st.subheader("Ekstrak Pesan dari Gambar")
+    image_file = st.file_uploader("Pilih Gambar yang Telah Disisipkan Pesan", type=["jpg", "jpeg", "png"])
 
-        elif operation == "Decode":
-            if st.button("Decode"):
-                decoded_message = decode_image(original_image)
-                st.success(f"Decoded Message: {decoded_message}")
-
-if __name__ == "__main__":
-    main()
+    if st.button("Decode"):
+        if image_file is not None:
+            decoded_message = decode(image_file)
+            st.success(f"Pesan yang diekstrak: {decoded_message}")
+        else:
+            st.warning("Silakan pilih gambar terlebih dahulu.")
