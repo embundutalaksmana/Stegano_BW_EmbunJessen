@@ -79,8 +79,11 @@ def steganography_app():
 
     elif operation == "About":
         st.subheader("Kelompok Sekian | 4 TI E")
-        st.write("Embun Duta Laksmana")
-        st.write("Jessen Wind Lim")
+        st.code(f"""
+                    Embun Duta Laksmana
+
+                    Jessen Wind Lim)
+                    """)
        
 def decode_enc(image):
     data = ''
