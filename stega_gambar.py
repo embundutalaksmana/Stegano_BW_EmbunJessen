@@ -46,7 +46,7 @@ def encode_enc(newimg, data):
             x += 1
 
 def steganography_app():
-    st.title("Steganography with Image")
+    st.title("Steganography with Image B & W")
 
     operation = st.sidebar.selectbox("Select Operation", ["Encode", "Decode"])
 
@@ -76,7 +76,8 @@ def steganography_app():
                 st.success(f"Decoded Data: {decoded_data}")
             else:
                 st.warning("Please upload an encoded image.")
-
+    elif operation == "About":
+        st.subheader("Kelompok Sekian")
 def decode_enc(image):
     data = ''
     img_data = iter(image.getdata())
