@@ -9,7 +9,7 @@ def encode(img, message):
     data_index = 0
     for i in range(len(pixels)):
         pixel = list(pixels[i])
-        for j in range(3):
+        for j in range(len(pixel)):
             if data_index < len(binary_message):
                 pixel[j] = pixel[j] & ~1 | int(binary_message[data_index])
                 data_index += 1
@@ -25,7 +25,7 @@ def decode(img):
     binary_message = ''
 
     for pixel in pixels:
-        for j in range(3):
+        for j in range(len(pixel)):
             binary_message += str(pixel[j] & 1)
 
     delimiter_index = binary_message.find('1111111111111110')
