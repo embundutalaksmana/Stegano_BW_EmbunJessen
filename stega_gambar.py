@@ -13,7 +13,6 @@ def encode(img, message):
             if data_index < len(binary_message):
                 pixel[j] = pixel[j] & ~1 | int(binary_message[data_index])
                 data_index += 1
-
         pixels[i] = tuple(pixel)
 
     encoded_img = Image.new(img.mode, img.size)
@@ -35,7 +34,7 @@ def decode(img):
     return message
 
 # Streamlit App
-st.title("Steganografi Gambar dengan LSB")
+st.title("Steganografi Gambar RGB dengan LSB")
 
 option = st.selectbox("Pilih Operasi", ["Encode", "Decode"])
 
