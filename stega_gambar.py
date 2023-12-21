@@ -60,8 +60,6 @@ elif option == "Decode":
     if st.button("Decode"):
         if image_file is not None:
             img = Image.open(io.BytesIO(image_file.read()))
-            if img.mode != 'RGB':
-                img = img.convert('RGB')
             decoded_message = decode(img)
             st.success(f"Pesan yang diekstrak: {decoded_message}")
         else:
