@@ -46,8 +46,7 @@ if option == "Encode":
     if st.button("Encode"):
         if image_file is not None and message != "":
             img = Image.open(io.BytesIO(image_file.read()))
-            if img.mode != 'RGB':
-                img = img.convert('RGB')
+            
             encoded_img = encode(img, message)
             st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
         else:
