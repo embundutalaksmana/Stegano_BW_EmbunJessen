@@ -26,7 +26,7 @@ import io
 #     # message = ''.join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
 #     # return message
 # Streamlit App
-st.header("Steganografi Gambar dengan LSB")
+st.title("Steganografi Gambar dengan LSB")
 option = st.selectbox("Pilih Operasi", ["Encode", "Decode"])
 if option == "Encode":
     st.subheader("Sisipkan Pesan ke dalam Gambar")
