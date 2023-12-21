@@ -1,65 +1,63 @@
 import streamlit as st
 from PIL import Image
-import io
 
-def encode(img, message):
-    pixels = list(img.getdata())
-    binary_message = ''.join(format(ord(char), '08b') for char in message) + '1111111111111110'
+def lsb_encode(cover_path, secret_path, output_path):
+    cover = Image.open(cover_path).convert('RGB')
+    secret = Image.open(secret_path).convert('RGB')
 
-    data_index = 0
-    for i in range(len(pixels)):
-        pixel = list(pixels[i])
-        for j in range(3):
-            if data_index < len(binary_message):
-                pixel[j] = pixel[j] & ~1 | int(binary_message[data_index])
-                data_index += 1
-        pixels[i] = tuple(pixel)
+    cover_data = cover.getdata()
+    secret_data = secret.getdata()
 
-    encoded_img = Image.new(img.mode, img.size)
-    encoded_img.putdata(pixels)
-    return encoded_img
+    stego_data = []
+    for cover_pixel, secret_pixel in zip(cover_data, secret_data):
+        stego_pixel = []
+        for c, s in zip(cover_pixel, secret_pixel):
+            stego_channel = (c & 0xFE) | ((s >> 7) & 1)
+            stego_pixel.append(stego_channel)
+        stego_data.append(tuple(stego_pixel))
 
-def decode(img):
-    pixels = list(img.getdata())
-    binary_message = ''
+    stego = Image.new('RGB', cover.size)
+    stego.putdata(stego_data)
+    stego.save(output_path)
 
-    for pixel in pixels:
-        for j in range(3):
-            binary_message += str(pixel[j] & 1)
+def lsb_decode(stego_path):
+    stego = Image.open(stego_path).convert('RGB')
+    stego_data = stego.getdata()
 
-    delimiter_index = binary_message.find('1111111111111110')
-    binary_message = binary_message[:delimiter_index]
+    extracted_data = []
+    for stego_pixel in stego_data:
+        extracted_pixel = 0
+        for channel in stego_pixel:
+            extracted_pixel = (extracted_pixel << 1) | (channel & 1)
+        extracted_data.append(extracted_pixel)
 
-    message = ''.join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
-    return message
+    extracted_info = bytes(extracted_data)
+    return extracted_info
 
-# Streamlit App
-st.title("Steganografi Gambar RGB dengan LSB")
+def main():
+    st.title("LSB Steganography App")
+    st.sidebar.header("Settings")
 
-option = st.selectbox("Pilih Operasi", ["Encode", "Decode"])
+    # Upload cover image
+    cover_image = st.sidebar.file_uploader("Upload Cover Image", type=["jpg", "jpeg", "png"])
 
-if option == "Encode":
-    st.subheader("Sisipkan Pesan ke dalam Gambar")
-    image_file = st.file_uploader("Pilih Gambar", type=["jpg", "jpeg", "png"])
-    message = st.text_area("Masukkan Pesan yang Akan Disisipkan")
+    # Upload secret image
+    secret_image = st.sidebar.file_uploader("Upload Secret Image", type=["jpg", "jpeg", "png"])
 
-    if st.button("Encode"):
-        if image_file is not None and message != "":
-            img = Image.open(io.BytesIO(image_file.read()))
-            
-            encoded_img = encode(img, message)
-            st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
-        else:
-            st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
+    if cover_image and secret_image:
+        # Output path for stego image
+        output_stego_path = "stego_image.png"
 
-elif option == "Decode":
-    st.subheader("Ekstrak Pesan dari Gambar")
-    image_file = st.file_uploader("Pilih Gambar yang Telah Disisipkan Pesan", type=["jpg", "jpeg", "png"])
+        # Sisipkan informasi
+        lsb_encode(cover_image, secret_image, output_stego_path)
+        st.success("Informasi telah disisipkan ke dalam gambar cover.")
 
-    if st.button("Decode"):
-        if image_file is not None:
-            img = Image.open(io.BytesIO(image_file.read()))
-            decoded_message = decode(img)
-            st.success(f"Pesan yang diekstrak: {decoded_message}")
-        else:
-            st.warning("Silakan pilih gambar terlebih dahulu.")
+        # Ekstrak informasi
+        extracted_info = lsb_decode(output_stego_path)
+        st.info("Informasi yang diekstrak: {}".format(extracted_info.decode('utf-8')))
+
+        # Tampilkan gambar cover, secret, dan stego
+        st.image([cover_image, secret_image, output_stego_path], caption=["Cover Image", "Secret Image", "Stego Image"])
+
+if __name__ == "__main__":
+    main()
