@@ -11,9 +11,7 @@ def encode(img, message):
             if data_index < len(binary_message):
                 pixel[j] = pixel[j] & ~1 | int(binary_message[data_index])
                 data_index += 1
-
         pixels[i] = tuple(pixel)
-
     encoded_img = Image.new(img.mode, img.size)
     encoded_img.putdata(pixels)
     return encoded_img
@@ -27,13 +25,9 @@ def decode(img):
     binary_message = binary_message[:delimiter_index]
     message = ''.join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
     return message
-
 # Streamlit App
-st.title("Steganografi Gambar dengan LSB")
-
-
+st.title("Steganografi Gambar RGB dengan LSB")
 option = st.selectbox("Pilih Operasi", ["Encode", "Decode"])
-
 if option == "Encode":
     st.subheader("Sisipkan Pesan ke dalam Gambar")
     image_file = st.file_uploader("Pilih Gambar", type=["jpg", "jpeg", "png"])
@@ -41,6 +35,8 @@ if option == "Encode":
     if st.button("Encode"):
         if image_file is not None and message != "":
             img = Image.open(io.BytesIO(image_file.read()))
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
             encoded_img = encode(img, message)
             st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
         else:
@@ -51,7 +47,9 @@ elif option == "Decode":
     if st.button("Decode"):
         if image_file is not None:
             img = Image.open(io.BytesIO(image_file.read()))
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
             decoded_message = decode(img)
             st.success(f"Pesan yang diekstrak: {decoded_message}")
         else:
-            st.warning("Silakan pilih gambar terlebih dahulu.") 
+            st.warning("Silakan pilih gambar terlebih dahulu.")
