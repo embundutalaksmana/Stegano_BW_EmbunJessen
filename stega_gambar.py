@@ -1,76 +1,62 @@
 import streamlit as st
-import numpy as np
 from PIL import Image
+import numpy as np
 
-def text_to_binary(text):
+def encode_lsb(image_array, text):
     binary_text = ''.join(format(ord(char), '08b') for char in text)
-    return binary_text
-
-def encode_lsb(image, secret_text):
-    binary_secret_text = text_to_binary(secret_text)
-    binary_secret_text += '1111111111111110'  # Menambahkan delimiter akhir
+    binary_text += '1111111111111110'  # Adding a delimiter to mark the end of the message
 
     data_index = 0
-    image_data = np.array(image)
-
-    for row in range(image_data.shape[0]):
-        for col in range(image_data.shape[1]):
-            for color_channel in range(image_data.shape[2]):
-                if data_index < len(binary_secret_text):
-                    pixel_value = image_data[row, col, color_channel]
-                    new_pixel_value = pixel_value & 0b11111110 | int(binary_secret_text[data_index])
-                    image_data[row, col, color_channel] = new_pixel_value
+    for i in range(image_array.shape[0]):
+        for j in range(image_array.shape[1]):
+            for k in range(image_array.shape[2]):
+                if data_index < len(binary_text):
+                    image_array[i, j, k] = int(format(image_array[i, j, k], '08b')[:-1] + binary_text[data_index], 2)
                     data_index += 1
 
-    return Image.fromarray(image_data.astype('uint8'))
+    return image_array
 
-def decode_lsb(image):
-    binary_secret_text = ''
-    image_data = np.array(image)
+def decode_lsb(image_array):
+    binary_text = ''
+    for i in range(image_array.shape[0]):
+        for j in range(image_array.shape[1]):
+            for k in range(image_array.shape[2]):
+                binary_text += format(image_array[i, j, k], '08b')[-1]
 
-    for row in range(image_data.shape[0]):
-        for col in range(image_data.shape[1]):
-            for color_channel in range(image_data.shape[2]):
-                pixel_value = image_data[row, col, color_channel]
-                binary_secret_text += str(pixel_value & 1)
+    delimiter_index = binary_text.find('1111111111111110')
+    text_binary = binary_text[:delimiter_index]
 
-    delimiter_index = binary_secret_text.find('1111111111111110')
-    binary_secret_text = binary_secret_text[:delimiter_index]
+    decoded_text = ''
+    for i in range(0, len(text_binary), 8):
+        decoded_text += chr(int(text_binary[i:i+8], 2))
 
-    # Convert binary to text
-    secret_text = ''.join(chr(int(binary_secret_text[i:i+8], 2)) for i in range(0, len(binary_secret_text), 8))
-    return secret_text
+    return decoded_text
 
 def main():
-    st.title("LSB Steganography for Text in RGB Image")
+    st.title("LSB Steganography with Streamlit")
 
-    uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    if uploaded_image is not None:
-        secret_text = st.text_area("Enter the secret text:")
-        encode_button = st.button("Encode")
+        image_array = np.array(image)
 
-        if encode_button:
-            original_image = Image.open(uploaded_image)
-            st.image(original_image, caption="Original Image", use_column_width=True)
+        action = st.radio("Select an action:", ("Encode", "Decode"))
 
-            encoded_image = encode_lsb(original_image, secret_text)
-            st.image(encoded_image, caption="Encoded Image", use_column_width=True)
-
-            st.success("Image encoded successfully!")
-
-        st.header("Decode Secret Text from Image")
-        uploaded_encoded_image = st.file_uploader("Upload the encoded image", type=["jpg", "jpeg", "png"])
-
-        if uploaded_encoded_image is not None:
-            decode_button = st.button("Decode")
-
-            if decode_button:
-                encoded_image = Image.open(uploaded_encoded_image)
-                st.image(encoded_image, caption="Encoded Image", use_column_width=True)
-
-                decoded_text = decode_lsb(encoded_image)
-                st.success(f"Decoded Secret Text: {decoded_text}")
+        if action == "Encode":
+            message = st.text_area("Enter the text to hide:")
+            if st.button("Encode"):
+                if message:
+                    encoded_image_array = encode_lsb(image_array.copy(), message)
+                    encoded_image = Image.fromarray(encoded_image_array)
+                    st.image(encoded_image, caption="Encoded Image", use_column_width=True)
+                else:
+                    st.warning("Please enter a message to hide.")
+        elif action == "Decode":
+            if st.button("Decode"):
+                decoded_text = decode_lsb(image_array.copy())
+                st.success(f"Decoded Text: {decoded_text}")
 
 if __name__ == "__main__":
     main()
