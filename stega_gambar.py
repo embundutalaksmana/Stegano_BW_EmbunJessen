@@ -77,14 +77,22 @@ def showData(image):
 
 # Encode data into image 
 def encode_text(image, data):
-    encoded_image = hideData(image, data)
+    # Convert PIL Image to numpy array
+    image_np = np.array(image)
+    encoded_image = hideData(image_np, data)
+    # Convert the resulting numpy array back to PIL Image
+    encoded_image = Image.fromarray(encoded_image)
     return encoded_image
 
-def decode_text(image):
-    return showData(image)
+def encode_text(image, data):
+    # Convert PIL Image to numpy array
+    image_np = np.array(image)
+    encoded_image = hideData(image_np, data)
+    # Convert the resulting numpy array back to PIL Image
+    encoded_image = Image.fromarray(encoded_image)
+    return encoded_image
 
 
-# Image Steganography         
 def main():
     st.title("Image Steganography App")
 
@@ -94,7 +102,8 @@ def main():
         st.header("Encode Data")
         image_name = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         if image_name is not None:
-            image = Image.imdecode(np.fromstring(image_name.read(), np.uint8), 1)
+            # Open the image using PIL
+            image = Image.open(image_name)
             st.image(image, caption="Original Image", use_column_width=True)
 
             data = st.text_input("Enter data to be encoded:", "")
@@ -109,7 +118,8 @@ def main():
 
         steganographed_image = st.file_uploader("Upload steganographed image", type=["jpg", "jpeg", "png"])
         if steganographed_image is not None:
-            steg_image = Image.imdecode(np.fromstring(steganographed_image.read(), np.uint8), 1)
+            # Open the image using PIL
+            steg_image = Image.open(steganographed_image)
             st.image(steg_image, caption="Steganographed Image", use_column_width=True)
 
             if st.button("Decode"):
