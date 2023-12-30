@@ -1,5 +1,5 @@
 import streamlit as st
-import cv2
+from PIL import Image
 import numpy as np
 
 def messageToBinary(message):
@@ -94,7 +94,7 @@ def main():
         st.header("Encode Data")
         image_name = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
         if image_name is not None:
-            image = cv2.imdecode(np.fromstring(image_name.read(), np.uint8), 1)
+            image = Image.imdecode(np.fromstring(image_name.read(), np.uint8), 1)
             st.image(image, caption="Original Image", use_column_width=True)
 
             data = st.text_input("Enter data to be encoded:", "")
@@ -109,7 +109,7 @@ def main():
 
         steganographed_image = st.file_uploader("Upload steganographed image", type=["jpg", "jpeg", "png"])
         if steganographed_image is not None:
-            steg_image = cv2.imdecode(np.fromstring(steganographed_image.read(), np.uint8), 1)
+            steg_image = Image.imdecode(np.fromstring(steganographed_image.read(), np.uint8), 1)
             st.image(steg_image, caption="Steganographed Image", use_column_width=True)
 
             if st.button("Decode"):
