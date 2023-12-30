@@ -34,24 +34,25 @@ def hideData(image, secret_message):
   data_len = len(binary_secret_msg) #Find the length of data that needs to be hidden
   for values in image:
       for pixel in values:
-          # convert RGB values to binary format
-          r, g, b = messageToBinary(pixel)
-          # modify the least significant bit only if there is still data to store
-          if data_index < data_len:
-              # hide the data into least significant bit of red pixel
-              pixel[0] = int(r[:-1] + binary_secret_msg[data_index], 2)
-              data_index += 1
-          if data_index < data_len:
-              # hide the data into least significant bit of green pixel
-              pixel[1] = int(g[:-1] + binary_secret_msg[data_index], 2)
-              data_index += 1
-          if data_index < data_len:
-              # hide the data into least significant bit of  blue pixel
-              pixel[2] = int(b[:-1] + binary_secret_msg[data_index], 2)
-              data_index += 1
+        # convert RGB values to binary format
+        binary_values = messageToBinary(pixel)
+        # modify the least significant bit only if there is still data to store
+        if data_index < data_len:
+            # hide the data into the least significant bit of red pixel
+            pixel[0] = int(binary_values[0][:-1] + binary_secret_msg[data_index], 2)
+            data_index += 1
+        if data_index < data_len:
+            # hide the data into the least significant bit of green pixel
+            pixel[1] = int(binary_values[1][:-1] + binary_secret_msg[data_index], 2)
+            data_index += 1
+        if data_index < data_len:
+            # hide the data into the least significant bit of blue pixel
+            pixel[2] = int(binary_values[2][:-1] + binary_secret_msg[data_index], 2)
+            data_index += 1
+
           # if data is encoded, just break out of the loop
-          if data_index >= data_len:
-              break
+        if data_index >= data_len:
+            break
 
   return image
 
