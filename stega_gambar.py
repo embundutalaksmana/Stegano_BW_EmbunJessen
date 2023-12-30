@@ -2,15 +2,15 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 
-def messageToBinary(message):
-  if type(message) == str:
-    return ''.join([ format(ord(i), "08b") for i in message ])
-  elif type(message) == bytes or type(message) == np.ndarray:
-    return [ format(i, "08b") for i in message ]
-  elif type(message) == int or type(message) == np.uint8:
-    return format(message, "08b")
-  else:
-    raise TypeError("Input type not supported")
+def messageToBinary(pixel):
+    if type(pixel) == str:
+        return tuple(int(format(ord(i), "08b"), 2) for i in pixel)
+    elif type(pixel) == bytes or type(pixel) == np.ndarray:
+        return tuple(int(format(i, "08b"), 2) for i in pixel)
+    elif type(pixel) == int or type(pixel) == np.uint8:
+        return int(format(pixel, "08b"), 2),
+    else:
+        raise TypeError("Input type not supported")
 
 
 # Function to hide the secret message into the image
