@@ -53,6 +53,8 @@ elif option == "Decode":
             img = Image.open(io.BytesIO(image_file.read()))
 
             decoded_message = decode_gray(img)
-            st.success(f"Pesan yang diekstrak: {decoded_message}")
+            st.subheader("Pesan yang diekstrak:")
+            st.text(decoded_message)
         else:
             st.warning("Silakan pilih gambar terlebih dahulu.")
+
