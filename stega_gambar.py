@@ -40,7 +40,7 @@ if option == "Encode":
             img = Image.open(io.BytesIO(image_file.read()))
 
             encoded_img = encode_gray(img, message)
-            st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True, format='JPEG')
+            st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
         else:
             st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
 
