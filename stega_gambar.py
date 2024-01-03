@@ -20,7 +20,7 @@ def decode_gray(img):
     pixels = list(img.getdata())
     binary_message = ''
     for pixel in pixels:
-        binary_message += str(pixel[0] & 1)
+        binary_message += str(pixel & 1)  # Fix here: Remove [0] subscript
     delimiter_index = binary_message.find('1111111111111110')
     binary_message = binary_message[:delimiter_index]
     message = ''.join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
