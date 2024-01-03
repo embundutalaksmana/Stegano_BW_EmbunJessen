@@ -9,7 +9,7 @@ def encode_gray(img, message):
     for i in range(len(pixels)):
         pixel = pixels[i]
         if data_index < len(binary_message):
-            new_pixel = pixel & ~1 | int(binary_message[data_index])
+            new_pixel = (pixel[0] & ~1 | int(binary_message[data_index]),)
             pixels[i] = new_pixel
             data_index += 1
     encoded_img = Image.new('L', img.size)
@@ -20,7 +20,7 @@ def decode_gray(img):
     pixels = list(img.getdata())
     binary_message = ''
     for pixel in pixels:
-        binary_message += str(pixel & 1)
+        binary_message += str(pixel[0] & 1)
     delimiter_index = binary_message.find('1111111111111110')
     binary_message = binary_message[:delimiter_index]
     message = ''.join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
