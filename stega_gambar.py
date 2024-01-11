@@ -6,12 +6,13 @@ def encode(img, message):
     binary_message = ''.join(format(ord(char), '08b') for char in message) + '1111111111111110'
     data_index = 0
     for i in range(len(pixels)):
-        pixel = list(pixels[i])
-        for j in range(3):
+        pixel = pixels[i]
+        for j in range(len(pixel)):  # Use len(pixel) to handle images with different color channels
             if data_index < len(binary_message):
-                pixel[j] = pixel[j] & ~1 | int(binary_message[data_index])
+                pixel = pixel & ~(1 << j) | (int(binary_message[data_index]) << j)
                 data_index += 1
-        pixels[i] = tuple(pixel)
+        pixels[i] = pixel
+
     encoded_img = Image.new(img.mode, img.size)
     encoded_img.putdata(pixels)
     return encoded_img
@@ -50,10 +51,13 @@ if option == "Encode":
             # Normalisasi gambar sebelum encoding
             normalized_img = normalize_image(img)
 
-            encoded_img = encode(normalized_img, message)
+            # Convert the image to grayscale before encoding
+            grayscale_img = normalized_img.convert("L")
+
+            encoded_img = encode(grayscale_img, message)
             st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
-        else:
-            st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
+    else:
+        st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
 
 # ...
 
