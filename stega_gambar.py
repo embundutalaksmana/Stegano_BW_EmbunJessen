@@ -43,9 +43,7 @@ if option == "Encode":
      # Pengecekan ukuran minimal 25KB
     if image_file is not None and image_file.size < 25 * 1024:  # 25 KB dalam byte
         st.warning("Ukuran gambar harus minimal 25KB.")
-    else:
-        message = st.text_area("Masukkan Pesan yang Akan Disisipkan")
-
+    
         if st.button("Encode"):
             
             if image_file is not None and message != "":
