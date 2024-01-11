@@ -34,7 +34,7 @@ st.title("Steganografi Gambar Hitam Putih dengan Algoritma LSB")
 option = st.selectbox("Pilih Operasi", ["Encode", "Decode"])
 if option == "Encode":
     st.subheader("Sisipkan Pesan ke dalam Gambar")
-    image_file = st.file_uploader("Pilih Gambar", type=["jpg","png"])
+    image_file = st.file_uploader("Pilih Gambar", type=["png"])
     message = st.text_area("Masukkan Pesan yang Akan Disisipkan")
      # Pengecekan ukuran minimal 25KB
     if image_file is not None and image_file.size < 25 * 1024:  # 25 KB dalam byte
