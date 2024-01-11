@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image
 import io
+import base64
 def encode(img, message):
     pixels = list(img.getdata())
     binary_message = ''.join(format(ord(char), '08b') for char in message) + '1111111111111110'
@@ -47,10 +48,7 @@ if option == "Encode":
             
             encoded_img = encode(img, message)
             st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
-            # Save the encoded image
-            encoded_img.save("encoded_image.png")  # Adjust the file name and format as needed
-            st.success("Gambar berhasil disimpan sebagai encoded_image.png")
-             # Simpan gambar di objek BytesIO
+            # Simpan gambar di objek BytesIO
             img_byte_array = io.BytesIO()
             encoded_img.save(img_byte_array, format='PNG')
             img_byte_array = img_byte_array.getvalue()
