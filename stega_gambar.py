@@ -32,6 +32,8 @@ def normalize_image(img):
     normalized_img = img.convert("L")  # Konversi gambar ke skala abu-abu
     return normalized_img
 # Streamlit App
+st.title("Steganografi Gambar Hitam Putih dengan Algoritma LSB")
+option = st.selectbox("Pilih Operasi", ["Encode", "Decode"])
 if option == "Encode":
     st.subheader("Sisipkan Pesan ke dalam Gambar")
     image_file = st.file_uploader("Pilih Gambar", type=["jpg","png"])
