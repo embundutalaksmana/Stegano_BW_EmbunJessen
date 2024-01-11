@@ -50,19 +50,16 @@ if option == "Encode":
             # Save the encoded image
             encoded_img.save("encoded_image.png")  # Adjust the file name and format as needed
             st.success("Gambar berhasil disimpan sebagai encoded_image.png")
-            if st.button("Unduh Gambar Hasil Encode"):
-                # Simpan gambar di objek BytesIO
-                img_byte_array = io.BytesIO()
-                encoded_img.save(img_byte_array, format='PNG')
-                img_byte_array = img_byte_array.getvalue()
+             # Simpan gambar di objek BytesIO
+            img_byte_array = io.BytesIO()
+            encoded_img.save(img_byte_array, format='PNG')
+            img_byte_array = img_byte_array.getvalue()
 
-                # Tampilkan tombol unduh
-                st.download_button(
-                    label="Unduh Gambar",
-                    data=img_byte_array,
-                    file_name="gambar_hasil_encode.png",
-                    key="unduh_gambar"
-                )
+            # Konversi gambar ke format data yang dapat diunduh
+            encoded_img_str = base64.b64encode(img_byte_array).decode('utf-8')
+            
+            # Tampilkan tombol unduh
+            st.markdown(f'<a href="data:file/png;base64,{encoded_img_str}" download="gambar_hasil_encode.png">Unduh Gambar</a>', unsafe_allow_html=True)
         else:
             st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
 elif option == "Decode":
