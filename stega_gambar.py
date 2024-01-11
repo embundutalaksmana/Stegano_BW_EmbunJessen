@@ -47,6 +47,9 @@ if option == "Encode":
             
             encoded_img = encode(img, message)
             st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
+            # Save the encoded image
+            encoded_img.save("encoded_image.png")  # Adjust the file name and format as needed
+            st.success("Gambar berhasil disimpan sebagai encoded_image.png")
         else:
             st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
 elif option == "Decode":
