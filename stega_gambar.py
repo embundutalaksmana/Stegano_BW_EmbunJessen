@@ -28,34 +28,29 @@ def decode(img):
             break
         message += chr(int(byte, 2))
     return message
-def download_button(encoded_img, filename='encoded_image.png'):
-    bio = io.BytesIO()
-    encoded_img.save(bio, format='PNG')
-    bio.seek(0)
-    st.download_button("Download Gambar Terenkripsi", bio, key='download_button', file_name=filename)
+
 # Streamlit App
 st.title("Steganografi Gambar Hitam Putih dengan Algoritma LSB")
 option = st.selectbox("Pilih Operasi", ["Encode", "Decode"])
 if option == "Encode":
     st.subheader("Sisipkan Pesan ke dalam Gambar")
     image_file = st.file_uploader("Pilih Gambar", type=["png"])
+    message = st.text_area("Masukkan Pesan yang Akan Disisipkan")
      # Pengecekan ukuran minimal 25KB
     if image_file is not None and image_file.size < 25 * 1024:  # 25 KB dalam byte
         st.warning("Ukuran gambar harus minimal 25KB.")
     else:
         message = st.text_area("Masukkan Pesan yang Akan Disisipkan")
 
-        if st.button("Encode"):
+    if st.button("Encode"):
+        
+        if image_file is not None and message != "":
+            img = Image.open(io.BytesIO(image_file.read()))
             
-            if image_file is not None and message != "":
-                img = Image.open(io.BytesIO(image_file.read()))
-                
-                encoded_img = encode(img, message)
-                st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
-                # Menambahkan tombol download
-                download_button(encoded_img)
-            else:
-                st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
+            encoded_img = encode(img, message)
+            st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
+        else:
+            st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
 elif option == "Decode":
     st.subheader("Ekstrak Pesan dari Gambar")
     image_file = st.file_uploader("Pilih Gambar yang Telah Disisipkan Pesan", type=["png"])
