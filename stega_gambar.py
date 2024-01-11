@@ -32,7 +32,7 @@ def decode(img):
 
 # Streamlit App
 st.title("Steganografi Gambar Hitam Putih dengan Algoritma LSB")
-st.subtitle(" Saran Web Gambar PNG: https://www.pngwing.com")
+st.text(" Saran Web Gambar PNG: https://www.pngwing.com")
 option = st.selectbox("Pilih Operasi", ["Encode", "Decode"])
 if option == "Encode":
     st.subheader("Sisipkan Pesan ke dalam Gambar")
