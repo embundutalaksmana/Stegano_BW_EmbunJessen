@@ -51,7 +51,7 @@ if option == "Encode":
             st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
 elif option == "Decode":
     st.subheader("Ekstrak Pesan dari Gambar")
-    image_file = st.file_uploader("Pilih Gambar yang Telah Disisipkan Pesan", type=["png"])
+    image_file = st.file_uploader("Pilih Gambar yang Telah Disisipkan Pesan", type=["jpg","png"])
     if st.button("Decode"):
         if image_file is not None:
             img = Image.open(io.BytesIO(image_file.read()))
