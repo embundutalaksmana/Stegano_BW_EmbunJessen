@@ -46,17 +46,17 @@ if option == "Encode":
     else:
         message = st.text_area("Masukkan Pesan yang Akan Disisipkan")
 
-    if st.button("Encode"):
-        
-        if image_file is not None and message != "":
-            img = Image.open(io.BytesIO(image_file.read()))
+        if st.button("Encode"):
             
-            encoded_img = encode(img, message)
-            st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
-            # Menambahkan tombol download
-            download_button(encoded_img)
-        else:
-            st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
+            if image_file is not None and message != "":
+                img = Image.open(io.BytesIO(image_file.read()))
+                
+                encoded_img = encode(img, message)
+                st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
+                # Menambahkan tombol download
+                download_button(encoded_img)
+            else:
+                st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
 elif option == "Decode":
     st.subheader("Ekstrak Pesan dari Gambar")
     image_file = st.file_uploader("Pilih Gambar yang Telah Disisipkan Pesan", type=["png"])
