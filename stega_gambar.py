@@ -48,19 +48,10 @@ if option == "Encode":
                 encoded_img = encode(img, message)
                 st.image(encoded_img, caption="Gambar Hasil Encode", use_column_width=True)
 
-                if st.button("Unduh Gambar Hasil Encode"):
-                    # Mengonversi gambar hasil menjadi byte
-                    img_byte_array = io.BytesIO()
-                    encoded_img.save(img_byte_array, format='PNG')
-                    img_byte_array = img_byte_array.getvalue()
-
-                    # Memberikan tautan unduh
-                    st.download_button(
-                        label="Klik untuk mengunduh",
-                        data=img_byte_array,
-                        file_name="encoded_image.png",
-                        key="encoded_image"
-                    )
+                # Tombol untuk menyimpan gambar hasil encode
+                if st.button("Simpan Gambar Hasil Encode"):
+                    encoded_img.save("encoded_image.png")
+                    st.success("Gambar berhasil disimpan!")
             else:
                 st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
 
