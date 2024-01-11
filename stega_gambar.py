@@ -2,6 +2,9 @@ import streamlit as st
 from PIL import Image
 import io
 def encode(img, message):
+    # Ubah gambar ke mode RGB
+    img = img.convert("RGB")
+    
     pixels = list(img.getdata())
     binary_message = ''.join(format(ord(char), '08b') for char in message) + '1111111111111110'
     data_index = 0
@@ -33,7 +36,7 @@ st.title("Steganografi Gambar Hitam Putih dengan Algoritma LSB")
 option = st.selectbox("Pilih Operasi", ["Encode", "Decode"])
 if option == "Encode":
     st.subheader("Sisipkan Pesan ke dalam Gambar")
-    image_file = st.file_uploader("Pilih Gambar", type=["jpg", "jpeg", "png"])
+    image_file = st.file_uploader("Pilih Gambar", type=["png"])
     message = st.text_area("Masukkan Pesan yang Akan Disisipkan")
     if st.button("Encode"):
         if image_file is not None and message != "":
