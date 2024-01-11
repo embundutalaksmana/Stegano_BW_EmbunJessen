@@ -2,9 +2,6 @@ import streamlit as st
 from PIL import Image
 import io
 def encode(img, message):
-    # Ubah gambar ke mode RGB
-    img = img.convert("RGB")
-    
     pixels = list(img.getdata())
     binary_message = ''.join(format(ord(char), '08b') for char in message) + '1111111111111110'
     data_index = 0
@@ -48,7 +45,7 @@ if option == "Encode":
             st.warning("Silakan pilih gambar dan masukkan pesan terlebih dahulu.")
 elif option == "Decode":
     st.subheader("Ekstrak Pesan dari Gambar")
-    image_file = st.file_uploader("Pilih Gambar yang Telah Disisipkan Pesan", type=["jpg", "jpeg", "png"])
+    image_file = st.file_uploader("Pilih Gambar yang Telah Disisipkan Pesan", type=["png"])
     if st.button("Decode"):
         if image_file is not None:
             img = Image.open(io.BytesIO(image_file.read()))
