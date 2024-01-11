@@ -17,13 +17,16 @@ def encode(img, message):
     return encoded_img
 def decode(img):
     pixels = list(img.getdata())
-    binary_message = ''
+    binary_message = ""
     for pixel in pixels:
-        for j in range(3):
-            binary_message += str(pixel[j] & 1)
-    delimiter_index = binary_message.find('1111111111111110')
-    binary_message = binary_message[:delimiter_index]
-    message = ''.join(chr(int(binary_message[i:i+8], 2)) for i in range(0, len(binary_message), 8))
+        for color in pixel[:3]:
+            binary_message += str(color & 1)
+    message = ""
+    for i in range(0, len(binary_message), 8):
+        byte = binary_message[i:i+8]
+        if byte == '11111111':
+            break
+        message += chr(int(byte, 2))
     return message
 # Streamlit App
 st.title("Steganografi Gambar Hitam Putih dengan Algoritma LSB")
